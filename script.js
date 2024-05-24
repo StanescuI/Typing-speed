@@ -1,7 +1,7 @@
-const MILLISECONDS_INCREASE = 1000 / 60
-let wordDisplay = document.getElementById('text')
-let timeDisplay = document.getElementById('time')
-let result = document.getElementById('result')
+const MILLISECONDS_INCREASE = 1000 / 60;
+let wordDisplay = document.getElementById('text');
+let timeDisplay = document.getElementById('time');
+let result = document.getElementById('result');
 let words = ['these', 'are', 'some', 'regular', 'words', 'that', 'coming',
              'to', 'my', 'mind', 'in', 'no', 
             'particular', 'order', 'and', 'i', 'will', 'stop', 'when',
@@ -9,87 +9,104 @@ let words = ['these', 'are', 'some', 'regular', 'words', 'that', 'coming',
             'okay', 'alright', 'awesome', 'amazing', 'extraordinary',
             'cool', 'shiny', 'fresh', 'gaming', 'cat',
             'dog', 'banana', 'pizza', 'elephant', 'you', 'me', 'him',
-            'her', 'they', 'them', 'wellcode', 'software']
-let letters
-document.addEventListener('keydown', checkLetter)
-let timeId
-let inTyping = false
-let letterIndex
-let noLetters
-let noWords
-let rightLetters
+            'her', 'they', 'them', 'wellcode', 'software'];
+let letters;
+let inTyping = false;
+document.addEventListener('keydown', (e) => 
+                          checkLetter(e, game));
 
-function startTyping() {
-    let randomPicker = -1;
-    milli = 0
-    seconds = 0
-    rightLetters = 0
-    noWords = 0
-    inTyping = true
-    noLetters = 0
-    rightLetters = 0
-    newWord(randomPicker)
-    timeId = setInterval(increaseTime(milli, seconds), MILLISECONDS_INCREASE);
-    result.textContent = 'TYPING SPEED . Press SPACE to reset'
-}
-
-function increaseTime(milli, seconds) {
-    ++milli
-    if (milli == 60) {
-        ++seconds
-        milli = 0
+class Game {
+    constructor() {
+        this.seconds = 0;
+        this.milli = 0;
+        this.rightLetters = 0;
+        this.noWords = 0;
+        this.noLetters = 0;
+        this.letterIndex = 0;
+        this.timeId = null;
     }
-    if (seconds == 60) {
-        stopTyping()
+
+    startTyping() {
+        this.seconds = 0;
+        this.milli = 0;
+        this.rightLetters = 0;
+        this.noWords = 0;
+        this.noLetters = 0;
+        inTyping = true;
+        this.letterIndex = 0;
+        newWord(this);
+        this.timeId = setInterval(() => 
+                      increaseTime(this), MILLISECONDS_INCREASE);
+        result.textContent = 'TYPING SPEED. Press SPACE to reset';
     }
-    timeDisplay.textContent = 'Time : ' + seconds.toString().padStart(2, '0') +
-                              ':' + milli.toString().padStart(2, '0');
+}
+let game = new Game();
+
+function increaseTime(game) {
+    game.milli++;
+    if (game.milli === 60) {
+        game.seconds++;
+        game.milli = 0;
+    }
+    if (game.seconds === 60) {
+        stopTyping(game);
+    }
+    timeDisplay.textContent = 'Time: ' + 
+                              game.seconds.toString().padStart(2, '0') + ':' + 
+                              game.milli.toString().padStart(2, '0');
 }
 
-function stopTyping(noWords) {
-    clearInterval(timeId)
-    inTyping = false
-    result.textContent = `Congratulations , your have managed to type ` +
-                         `${noWords} words, managing to` +
-                         ` score ${rightLetters} letters out of a total` +
-                         ` of ${noLetters}!\nYour accuracy is ` +
-                         `${(rightLetters / noLetters * 100).toFixed(2)}%`
+function stopTyping(game) {
+    clearInterval(game.timeId);
+    inTyping = false;
+    if (game.noLetters != 0) {
+        result.textContent = 
+            `Congratulations, you have managed to type `+ 
+             `${game.noWords - 1} words, managing to score ` + 
+             `${game.rightLetters} letters out of a total of `+ 
+             `${game.noLetters}!\nYour accuracy is ` + 
+             `${(game.rightLetters / game.noLetters * 100).toFixed(2)}%`;
+    } else {
+        result.textContent = `You didn't type any letter, press SPACE to try again !`;
+    }
 }
 
-function checkLetter(e) {
-    if (e.key == ' ' && !inTyping) {
-        startTyping()
-    } else if (e.key == ' ') {
-        stopTyping(noWords)
-    } else if (inTyping && e.key != ' ') {
-        let currLetter = wordDisplay.childNodes[letterIndex]
-        if (e.key == letters[letterIndex]) {
-            currLetter.classList.add('rightLetter')
-            ++rightLetters
+function checkLetter(e, game) {
+    if (e.key === ' ' && !inTyping) {
+        game.startTyping();
+    } else if (e.key === ' ') {
+        stopTyping(game);
+    } else if (inTyping && e.key !== ' ') {
+        let currLetter = wordDisplay.childNodes[game.letterIndex];
+        if (e.key === letters[game.letterIndex]) {
+            currLetter.classList.add('rightLetter');
+            game.rightLetters++;
         } else {
-            currLetter.classList.add('wrongLetter')
+            currLetter.classList.add('wrongLetter');
         }
-        ++letterIndex
-        if (letterIndex == letters.length) {
-            newWord()
+        game.letterIndex++;
+        if (game.letterIndex === letters.length) {
+            newWord(game);
         }
-        ++noLetters
+        game.noLetters++;
     }
 }
 
-function newWord(randomPicker) {
-    letterIndex = 0
-    oldPick = randomPicker
-    while (oldPick == randomPicker) {
-        randomPicker = Math.floor(Math.random() * words.length)
-    }
-    let selectedWord = words[randomPicker]
-    letters = selectedWord.split('')
-    wordDisplay.textContent = ''
+function newWord(game) {
+    game.letterIndex = 0;
+    let oldPick = -1;
+    let randomPicker;
+    do {
+        randomPicker = Math.floor(Math.random() * words.length);
+    } while (oldPick === randomPicker);
+    oldPick = randomPicker;
+    let selectedWord = words[randomPicker];
+    letters = selectedWord.split('');
+    wordDisplay.textContent = '';
     letters.forEach(letter => {
-        let currLetter = document.createElement('span')
-        currLetter.textContent = letter
-        wordDisplay.appendChild(currLetter)
-    })
-    ++noWords
+        let currLetter = document.createElement('span');
+        currLetter.textContent = letter;
+        wordDisplay.appendChild(currLetter);
+    });
+    game.noWords++;
 }
