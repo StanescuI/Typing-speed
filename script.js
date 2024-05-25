@@ -17,6 +17,10 @@ document.addEventListener('keydown', (e) =>
 
 class Game {
     constructor() {
+        this.resetGame();
+    }
+
+    resetGame() {
         this.seconds = 0;
         this.milli = 0;
         this.rightLetters = 0;
@@ -27,17 +31,31 @@ class Game {
     }
 
     startTyping() {
-        this.seconds = 0;
-        this.milli = 0;
-        this.rightLetters = 0;
-        this.noWords = 0;
-        this.noLetters = 0;
+        this.resetGame();
         inTyping = true;
-        this.letterIndex = 0;
-        newWord(this);
+        this.newWord();
         this.timeId = setInterval(() => 
                       increaseTime(this), MILLISECONDS_INCREASE);
         result.textContent = 'TYPING SPEED. Press SPACE to reset';
+    }
+    
+    newWord() {
+        this.letterIndex = 0;
+        let oldPick = -1;
+        let randomPicker;
+        do {
+            randomPicker = Math.floor(Math.random() * words.length);
+        } while (oldPick === randomPicker);
+        oldPick = randomPicker;
+        let selectedWord = words[randomPicker];
+        letters = selectedWord.split('');
+        wordDisplay.textContent = '';
+        letters.forEach(letter => {
+            let currLetter = document.createElement('span');
+            currLetter.textContent = letter;
+            wordDisplay.appendChild(currLetter);
+        });
+        this.noWords++;
     }
 }
 let game = new Game();
@@ -67,7 +85,7 @@ function stopTyping(game) {
              `${game.noLetters}!\nYour accuracy is ` + 
              `${(game.rightLetters / game.noLetters * 100).toFixed(2)}%`;
     } else {
-        result.textContent = `You didn't type any letter, press SPACE to try again !`;
+        result.textContent = `0 typed letters, press SPACE to try again !`;
     }
 }
 
@@ -86,27 +104,8 @@ function checkLetter(e, game) {
         }
         game.letterIndex++;
         if (game.letterIndex === letters.length) {
-            newWord(game);
+            game.newWord();
         }
         game.noLetters++;
     }
-}
-
-function newWord(game) {
-    game.letterIndex = 0;
-    let oldPick = -1;
-    let randomPicker;
-    do {
-        randomPicker = Math.floor(Math.random() * words.length);
-    } while (oldPick === randomPicker);
-    oldPick = randomPicker;
-    let selectedWord = words[randomPicker];
-    letters = selectedWord.split('');
-    wordDisplay.textContent = '';
-    letters.forEach(letter => {
-        let currLetter = document.createElement('span');
-        currLetter.textContent = letter;
-        wordDisplay.appendChild(currLetter);
-    });
-    game.noWords++;
 }
