@@ -66,7 +66,7 @@ let game = new Game();
 function increaseTime(game) {
     ++game.ms;
     if (game.ms === SECONDS_PER_MINUTE) {
-        game.seconds++;
+        ++game.seconds;
         game.ms = 0;
     }
     if (game.seconds === SECONDS_PER_MINUTE) {
@@ -103,14 +103,14 @@ function checkLetter(e, game) {
         let currLetter = wordDisplay.childNodes[game.letterIndex];
         if (e.key === letters[game.letterIndex]) {
             currLetter.classList.add('rightLetter');
-            game.rightLetters++;
+            ++game.rightLetters;
         } else {
             currLetter.classList.add('wrongLetter');
         }
-        game.letterIndex++;
+        ++game.letterIndex;
         if (game.letterIndex === letters.length) {
             game.newWord();
         }
-        game.noLetters++;
+        ++game.noLetters;
     }
 }
