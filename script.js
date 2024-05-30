@@ -30,26 +30,27 @@ class Game {
         this.noLetters = 0;
         this.letterIndex = 0;
         this.timeId = null;
+        this.oldPick = -1;
     }
 
     startTyping() {
         this.resetGame();
         gameRunning = true;
-        let oldPick = -1;
-        this.newWord(oldPick);
+        this.newWord();
         this.timeId = setInterval(() => {
             increaseTime(this)
         }, MILLISECONDS_INCREASE);
         result.textContent = 'TYPING SPEED. Press SPACE to reset';
     }
     
-    newWord(oldPick) {
+    newWord() {
         this.letterIndex = 0;
+        console.log(this.oldPick);
         let randomPicker = Math.floor(Math.random() * words.length);
-        while (oldPick === randomPicker){
+        while (this.oldPick === randomPicker){
             randomPicker = Math.floor(Math.random() * words.length);
         }
-        oldPick = randomPicker;
+        this.oldPick = randomPicker;
         let selectedWord = words[randomPicker];
         letters = selectedWord.split('');
         wordDisplay.textContent = '';
