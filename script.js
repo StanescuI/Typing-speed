@@ -99,7 +99,7 @@ function checkLetter(e, game) {
     }
     if (e.key === ' ') {
         stopTyping(game);
-    } else if (e.key !== ' ') {
+    } else {
         let currLetter = wordDisplay.childNodes[game.letterIndex];
         if (e.key === letters[game.letterIndex]) {
             currLetter.classList.add('rightLetter');
