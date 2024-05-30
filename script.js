@@ -45,7 +45,6 @@ class Game {
     
     newWord() {
         this.letterIndex = 0;
-        console.log(this.oldPick);
         let randomPicker = Math.floor(Math.random() * words.length);
         while (this.oldPick === randomPicker){
             randomPicker = Math.floor(Math.random() * words.length);
